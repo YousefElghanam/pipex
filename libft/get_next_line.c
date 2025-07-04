@@ -6,7 +6,7 @@
 /*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 13:47:04 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/06/14 21:58:35 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/03 18:58:51 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ char	*line_from_list(t_chunk **node)
 
 char	*get_next_line(int fd)
 {
-	static t_chunk	*node[1048574];
+	static t_chunk	*node[128];
 	t_chunk			*tmp;
 	char			*buffer;
 	ssize_t			bytes_read;

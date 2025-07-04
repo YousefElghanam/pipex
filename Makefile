@@ -8,11 +8,11 @@ OBJ_DIR = objects/
 
 OBJ_DIR_BONUS = objects_bonus/
 
-CFLAGS = -Wall -Wextra -Werror -Ilibft
+CFLAGS = -Wall -Wextra -Werror -Ilibft -g
 
 HEADERS = pipex.h libft/libft.h
 
-SOURCES = main.c
+SOURCES = main.c commands.c
 
 # BONUS_SOURCES = main_bonus.c
 
