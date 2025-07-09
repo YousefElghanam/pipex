@@ -7,7 +7,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <fcntl.h>
-#include <errno.h>
+# include <errno.h>
 
 typedef struct s_cmd
 {
@@ -19,6 +19,8 @@ typedef struct s_abst
 {
 	int		(*pipefd)[2];
 	int		iofd[2];
+	int		is_here_doc;
+	char	*limiter;
 	int		status;
 	size_t	counter;
 	pid_t	pid;
@@ -26,7 +28,13 @@ typedef struct s_abst
 }	t_abst;
 
 /* commands.c */
-int		create_cmds(int argc, char **argv, t_cmd *cmds);
+int		create_cmds(int argc, char **argv, t_cmd *cmds, int is_here_doc);
 void	free_cmds(t_cmd *cmds);
+
+/* init.c */
+int		init_abst(int argc, char **argv, t_abst *d);
+
+/* main.c */
+void	free_all(t_abst *d);
 
 #endif

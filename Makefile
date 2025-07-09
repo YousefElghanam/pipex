@@ -12,7 +12,7 @@ CFLAGS = -Wall -Wextra -Werror -Ilibft -g
 
 HEADERS = pipex.h libft/libft.h
 
-SOURCES = main.c commands.c
+SOURCES = main.c commands.c init.c
 
 # BONUS_SOURCES = main_bonus.c
 
