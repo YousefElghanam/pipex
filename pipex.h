@@ -11,23 +11,22 @@
 
 typedef struct s_cmd
 {
-	char	**arr[100];
+	char	**arr[100001];
 	size_t	count;
 } t_cmd;
 
 typedef struct s_abst
 {
-	int		pipefd[2];
+	int		(*pipefd)[2];
 	int		iofd[2];
 	int		status;
 	size_t	counter;
 	pid_t	pid;
-	pid_t	pid2;
 	t_cmd	cmds;
 }	t_abst;
 
 /* commands.c */
 int		create_cmds(int argc, char **argv, t_cmd *cmds);
-void	free_cmds(t_cmd *cmds, size_t start, size_t count);
+void	free_cmds(t_cmd *cmds);
 
 #endif

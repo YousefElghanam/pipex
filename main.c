@@ -1,18 +1,10 @@
 #include "pipex.h"
 
-// int	child(int pipefd[2])
-// {
-// 	close(pipefd[0]);
-// 	char	*argv[3];
-
-// 	argv[0] = "echo";
-// 	argv[1] = "main.c";
-// 	argv[2] = NULL;
-// 	dup2(pipefd[1], STDOUT_FILENO);
-// 	execve("/bin/cat", argv, __environ);
-// 	close(pipefd[1]);
-// 	return (1);
-// }
+void	free_all(t_abst *d)
+{
+	free(d->pipefd);
+	free_cmds(&d->cmds);
+}
 
 void	print_all_cmds(t_cmd *cmds)
 {
@@ -37,45 +29,88 @@ void	print_all_cmds(t_cmd *cmds)
 static int	open_io_files(char **argv, t_abst *d)
 {
 	d->iofd[0] = open(argv[1], O_RDONLY);
-	d->iofd[1] = open(argv[d->cmds.count + 2], O_WRONLY);
-	if (d->iofd[0] < 0 || d->iofd[1] < 0)
+	if (d->iofd[0] == -1)
+		return (0);
+	d->iofd[1] = open(argv[d->cmds.count + 2], O_WRONLY | O_TRUNC);
+	if (d->iofd[1] == -1)
 		return (0);
 	return (1);
 }
 
-void	child_process(t_abst *d)
+void	close_pipes(t_abst *d)
 {
-	close(d->pipefd[0]);
-	ft_printf("cmd (%s) == arg (%s)\n", d->cmds.arr[d->counter][0], d->cmds.arr[d->counter][1]);
-	dup2(d->pipefd[1], STDOUT_FILENO);
-	dup2(d->iofd[0], STDIN_FILENO);
-	if (execve(d->cmds.arr[d->counter][0], d->cmds.arr[d->counter],
-		__environ) == -1)
-		exit(errno);
-	close(d->pipefd[1]);
-	free_cmds(&d->cmds, 0, d->cmds.count);
+	size_t	i;
+
+	i = 0;
+	close(d->iofd[0]);
+	close(d->iofd[1]);
+	while (i < d->cmds.count - 1)
+	{
+		if (d->pipefd[i][0] > -1)
+			close(d->pipefd[i][0]);
+		if (d->pipefd[i][1] > -1)
+			close(d->pipefd[i][1]);
+		i++;
+	}
 }
 
-void	child_process_2(t_abst *d)
+void	exec_first_cmd(t_abst *d)
 {
+	dup2(d->pipefd[0][1], STDOUT_FILENO);
+	dup2(d->iofd[0], STDIN_FILENO);
+	close_pipes(d);
+	if (execve(d->cmds.arr[0][0], d->cmds.arr[0], __environ)
+		== -1)
+		(free_all(d), exit(1));
+}
+
+void	exec_cmd(t_abst *d, size_t counter)
+{
+	// ft_printf("cmd (%s) == arg (%s)\n", d->cmds.arr[d->counter][0], d->cmds.arr[d->counter][1]);
+	if (counter == 0)
+	{
+		exec_first_cmd(d);
+		return ;
+	}
 	if (d->counter + 1 == d->cmds.count)
-		dup2(d->iofd[1], STDOUT_FILENO);	
+		dup2(d->iofd[1], STDOUT_FILENO);
 	else
-		dup2(d->pipefd[1], STDOUT_FILENO);
-	dup2(d->pipefd[0], STDIN_FILENO);
-	if (execve(d->cmds.arr[d->counter][0], d->cmds.arr[d->counter],
-		__environ) == -1)
-		exit(errno);
-	close(d->pipefd[1]);
-	close(d->pipefd[0]);
-	free_cmds(&d->cmds, 0, d->cmds.count);
+	{
+		dup2(d->pipefd[d->counter][1], STDOUT_FILENO);
+		close(d->pipefd[d->counter][1]);
+	}
+	dup2(d->pipefd[d->counter - 1][0], STDIN_FILENO);
+	close_pipes(d);
+	if (execve(d->cmds.arr[d->counter][0], d->cmds.arr[d->counter], __environ)
+		== -1)
+		(free_all(d), exit(1));
+}
+
+int	init_pipes(t_abst *d)
+{
+	size_t	i;
+	
+	i = 0;
+	d->pipefd = malloc(sizeof(int[2]) * (d->cmds.count - 1));
+	if (!d->pipefd)
+		return (0);
+	while (i < d->cmds.count - 1)
+	{
+		d->pipefd[i][0] = -1;
+		d->pipefd[i][1] = -1;
+		i++;
+	}
+	return (1);
 }
 
 int	init_abst(int argc, char **argv, t_abst *d)
 {
-	if (!create_cmds(argc, argv, &d->cmds)
-		|| !open_io_files(argv, d)
-		|| init_pipes()) ///////////////////////////////////// HERE, Need to allocate dynamic number of pipes ((CAREFUL FREE and SEARCHC OTHER WAYS FOR VARIABLE PIPES))
+	if (!create_cmds(argc, argv, &d->cmds))
+		return (0);
+	if (!init_pipes(d))
+		return (free_all(d), 0);
+	if (!open_io_files(argv, d))
+		return (free_all(d), 0);
 	d->counter = 0;
 	return (1);
 }
@@ -87,21 +122,24 @@ int	main(int argc, char **argv)
 	if (argc < 5)
 		return (1);
 	if (!init_abst(argc, argv, &d))
-		return (free_cmds(&d.cmds, 0, d.cmds.count), 1);
-	print_all_cmds(&d.cmds);
-	d.pid = fork();
-	if (d.pid == -1)
-		return (free_cmds(&d.cmds, 0, d.cmds.count), 1);
-	if (d.pid == 0)
-		(child_process(&d), exit(errno));
-	while (++d.counter < d.cmds.count)
-	{
-		d.pid2 = fork();
-		if (d.pid2 == -1)
-			return (free_cmds(&d.cmds, 0, d.cmds.count), 1);
-		if (d.pid2 == 0)
-			(child_process_2(&d), exit(errno));
-	}
-	(close(d.pipefd[0]), close(d.pipefd[1]));
-	return (free_cmds(&d.cmds, 0, d.cmds.count), 0);
+		return (ft_printf("init_error\n"), 1);
+	// print_all_cmds(&d.cmds);
+	// while (d.counter < d.cmds.count)
+	// {
+	// 	if (d.counter + 1 < d.cmds.count)
+	// 		if (pipe(d.pipefd[d.counter]) == -1)
+	// 			return (free_all(&d), 1);
+	// 	d.pid = fork();
+	// 	if (d.pid == -1)
+	// 		return (free_all(&d), 1);
+	// 	if (d.pid == 0)
+	// 		exec_cmd(&d, d.counter);
+	// 	d.counter++;
+	// }
+	// close_pipes(&d);
+	// while (wait(&d.status) > 0)
+	// 	;
+	// // perror(strerror(errno));
+	// // ft_printf("HERE: (%d)\n", d.status);
+	return (free_all(&d), 0);
 }

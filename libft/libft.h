@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: josefelghnam <josefelghnam@student.42.f    +#+  +:+       +#+        */
+/*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/14 21:54:09 by josefelghna       #+#    #+#             */
-/*   Updated: 2025/06/29 21:57:49 by josefelghna      ###   ########.fr       */
+/*   Updated: 2025/07/09 18:48:35 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ char	*ft_strchr(const char *s, int c);
 char	*ft_strdup(const char *s);
 void	ft_striteri(char *s, void (*f)(unsigned int, char*));
 char	*ft_strjoin(char const *s1, char const *s2);
+char	*ft_strsjoin(char const *s1, char const *s2, char const *s3);
 size_t	ft_strlcat(char *dst, const char *src, size_t dsize);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dsize);
 size_t	ft_strlen(const char *s);
