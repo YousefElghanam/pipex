@@ -6,7 +6,7 @@
 /*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:25 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/10 17:15:59 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/10 20:58:03 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,7 @@ static int	open_io_files(int argc, char **argv, t_abst *d)
 {
 	if (d->is_here_doc)
 	{
-		if (access(".here_doc", F_OK) == 0)
-			unlink(".here_doc");
+		unlink(".here_doc");
 		d->iofd[0] = open(".here_doc", O_RDWR | O_CREAT | O_TRUNC);
 		d->iofd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND);		
 	}

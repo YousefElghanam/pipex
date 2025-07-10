@@ -6,7 +6,7 @@
 /*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:28 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/10 17:15:53 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/10 20:05:36 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ static int	create_pathed_cmd(char **cmd)
 	while (__environ[i++])
 		if (ft_strncmp(__environ[i - 1], "PATH=", 5) == 0)
 			break ;
+	if (!__environ[i])
+		return (1);
 	path = ft_split(__environ[i - 1] + 5, ':');
 	if (!path)
 		return (0);
