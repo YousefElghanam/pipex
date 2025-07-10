@@ -6,7 +6,7 @@
 /*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:28 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/09 21:18:50 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/10 17:15:53 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,15 +77,15 @@ int	create_cmds(int argc, char **argv, t_cmd *cmds, int is_here_doc)
 	cmds->count = 0;
 	while (i + 3 < (size_t)argc && i < 100000)
 	{
-		cmds->arr[i] = ft_split(argv[i + 2], ' ');
-		if (!cmds->arr[i])
+		cmds->arr[i - is_here_doc] = ft_split(argv[i + 2], ' ');
+		if (!cmds->arr[i - is_here_doc])
 			return (free_cmds(cmds), 0);
 		cmds->count += 1;
-		if (!ft_strchr(cmds->arr[i][0], '/'))
-			if (!create_pathed_cmd(&cmds->arr[i][0]))
+		if (!ft_strchr(cmds->arr[i - is_here_doc][0], '/'))
+			if (!create_pathed_cmd(&cmds->arr[i - is_here_doc][0]))
 				return (free_cmds(cmds), 0);
 		i++;
 	}
-	cmds->arr[i] = NULL;
+	cmds->arr[i - is_here_doc] = NULL;
 	return (1);
 }
