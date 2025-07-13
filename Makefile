@@ -8,7 +8,7 @@ OBJ_DIR = objects/
 
 OBJ_DIR_BONUS = objects_bonus/
 
-CFLAGS = -Wall -Wextra -Werror -Ilibft
+CFLAGS = -Wall -Wextra -Werror -Ilibft -g
 
 HEADERS = pipex.h pipex_bonus.h libft/libft.h
 

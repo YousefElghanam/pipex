@@ -6,7 +6,7 @@
 /*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 22:52:04 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/11 22:53:49 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/13 14:35:23 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,10 @@ static void	exec_first_cmd(t_abst *d)
 		if (!d->iofd[0])
 			(free_all(d), perror("open"), exit(1));
 	}
-	dup2(d->pipefd[0][1], STDOUT_FILENO);
+	if (d->cmds.count == 1)
+		dup2(d->iofd[1], STDOUT_FILENO);
+	else
+		dup2(d->pipefd[0][1], STDOUT_FILENO);
 	dup2(d->iofd[0], STDIN_FILENO);
 	close_pipes(d);
 	if (execve(d->cmds.arr[0][0], d->cmds.arr[0], __environ)
@@ -48,7 +51,7 @@ int	main(int argc, char **argv)
 	t_abst	d;
 
 	if (argc < 5)
-		return (ft_printf("pipex: not enough arguments\n"), 1);
+		return (ft_putstr_fd("pipex: not enough arguments\n", 2), 1);
 	if (!init_data(argc, argv, &d))
 		return (perror("pipex"), 1);
 	while (d.counter < d.cmds.count)
