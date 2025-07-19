@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: josefelghnam <josefelghnam@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 22:51:03 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/11 22:51:04 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:22:03 by josefelghna      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,15 +49,4 @@ void	close_pipes(t_abst *d)
 		safe_close(d->pipefd[i][1]);
 		i++;
 	}
-}
-
-int	is_limiter(char *line, char *limiter)
-{
-	size_t	limiter_len;
-
-	limiter_len = ft_strlen(limiter);
-	if (ft_strncmp(line, limiter, limiter_len) == 0
-		&& line[limiter_len] == '\n')
-		return (1);
-	return (0);
 }

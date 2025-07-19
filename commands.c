@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: josefelghnam <josefelghnam@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:28 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/11 22:26:02 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:58:28 by josefelghna      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,21 +21,11 @@ static void	swap_pathed_cmd(char *pathed_cmd, char **cmd)
 	free(tmp);
 }
 
-static int	create_pathed_cmd(char **cmd)
+static int	search_paths(char **path, char **cmd)
 {
 	size_t	i;
 	char	*pathed_cmd;
-	char	**path;
 
-	i = 0;
-	while (__environ[i++])
-		if (ft_strncmp(__environ[i - 1], "PATH=", 5) == 0)
-			break ;
-	if (!__environ[i])
-		return (1);
-	path = ft_split(__environ[i - 1] + 5, ':');
-	if (!path)
-		return (0);
 	i = 0;
 	while (path[i])
 	{
@@ -47,7 +37,29 @@ static int	create_pathed_cmd(char **cmd)
 		free(pathed_cmd);
 		i++;
 	}
-	return (free_split_arr(path), 1);
+	write(2, *cmd, ft_strlen(*cmd));
+	write(2, ": command not found\n", 20);
+	return (free_split_arr(path), 0);
+}
+
+static int	create_pathed_cmd(char **cmd)
+{
+	size_t	i;
+	char	**path;
+
+	i = 0;
+	while (__environ[i])
+	{
+		if (ft_strncmp(__environ[i], "PATH=", 5) == 0)
+			break ;
+		i++;
+	}
+	if (!__environ[i] || ft_strlen(__environ[i]) < 6) // TODO: check when PATH is PATH=. or PATH=askdioqwkeokasd or PATH=/ or any other
+		return (write(2, "PATH is invalid\n", 16), 0);
+	path = ft_split(__environ[i] + 5, ':');
+	if (!path)
+		return (0);
+	return (search_paths(path, cmd));
 }
 
 void	free_cmds(t_cmd *cmds)
@@ -59,23 +71,23 @@ void	free_cmds(t_cmd *cmds)
 		free_split_arr(cmds->arr[i++]);
 }
 
-int	create_cmds(int argc, char **argv, t_cmd *cmds, int is_here_doc)
+int	create_cmds(int argc, char **argv, t_cmd *cmds)
 {
 	size_t	i;
 
-	i = is_here_doc;
+	i = 0;
 	cmds->count = 0;
 	while (i + 3 < (size_t)argc && i < 100000)
 	{
-		cmds->arr[i - is_here_doc] = ft_split(argv[i + 2], ' ');
-		if (!cmds->arr[i - is_here_doc])
-			return (free_cmds(cmds), 0);
+		cmds->arr[i] = ft_split(argv[i + 2], ' ');
+		if (!cmds->arr[i])
+			return (perror("pipex"), free_cmds(cmds), 0);
 		cmds->count += 1;
-		if (!ft_strchr(cmds->arr[i - is_here_doc][0], '/'))
-			if (!create_pathed_cmd(&cmds->arr[i - is_here_doc][0]))
+		if (!ft_strchr(cmds->arr[i][0], '/'))
+			if (!create_pathed_cmd(&cmds->arr[i][0]))
 				return (free_cmds(cmds), 0);
 		i++;
 	}
-	cmds->arr[i - is_here_doc] = NULL;
+	cmds->arr[i] = NULL;
 	return (1);
 }

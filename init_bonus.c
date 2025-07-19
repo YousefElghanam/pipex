@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
+/*   By: josefelghnam <josefelghnam@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:25 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/11 22:54:36 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:30:45 by josefelghna      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,13 @@ int	init_data(int argc, char **argv, t_abst *d)
 		d->is_here_doc = 1;
 		d->limiter = argv[2];
 	}
+	if (argc < 5 + d->is_here_doc)
+		return (write(2, "pipex: not enough arguments\n", 28), 0);
 	if (!create_cmds(argc, argv, &d->cmds, d->is_here_doc))
 		return (0);
 	if (!init_pipes(d))
-		return (free_all(d), 0);
+		return (perror("pipex"), free_all(d), 0);
 	if (!open_io_files(argc, argv, d))
-		return (free_all(d), 0);
+		return (perror("pipex"), free_all(d), 0);
 	return (1);
 }
