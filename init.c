@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: josefelghnam <josefelghnam@student.42.f    +#+  +:+       +#+        */
+/*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:25 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/19 18:21:37 by josefelghna      ###   ########.fr       */
+/*   Updated: 2025/07/21 20:34:04 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,17 @@ static int	open_io_files(int argc, char **argv, t_abst *d)
 int	init_data(int argc, char **argv, t_abst *d)
 {
 	d->counter = 0;
-	if (!create_cmds(argc, argv, &d->cmds))
-		return (0);
-	if (!init_pipes(d))
-		return (perror("pipex"), free_all(d), 0);
 	if (!open_io_files(argc, argv, d))
+		return (perror("pipex"), 0);
+	if (!create_cmds(argc, argv, &d->cmds))
+	{
+		(close(d->iofd[0]), close(d->iofd[1]));
+		return (0);
+	}
+	if (!init_pipes(d))
+	{
+		(close(d->iofd[0]), close(d->iofd[1]));
 		return (perror("pipex"), free_all(d), 0);
+	}
 	return (1);
 }

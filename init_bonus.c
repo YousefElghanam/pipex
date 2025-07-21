@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: josefelghnam <josefelghnam@student.42.f    +#+  +:+       +#+        */
+/*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:25 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/19 18:30:45 by josefelghna      ###   ########.fr       */
+/*   Updated: 2025/07/21 21:35:52 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ static void	fill_here_doc(t_abst *d)
 
 	while (1)
 	{
+		ft_printf ("> ");
 		line = get_next_line(0);
 		if (!line)
 			break ;
@@ -54,9 +55,9 @@ static void	fill_here_doc(t_abst *d)
 
 static int	here_doc(int argc, char **argv, t_abst *d)
 {
-	if (access("tmp", F_OK) == 0)
-		unlink("tmp");
-	d->iofd[0] = open("tmp", O_RDWR | O_CREAT, 0666);
+	if (access(".tmp", F_OK) == 0)
+		unlink(".tmp");
+	d->iofd[0] = open(".tmp", O_RDWR | O_CREAT, 0666);
 	if (d->iofd[0] == -1)
 		return (0);
 	d->iofd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
@@ -94,11 +95,17 @@ int	init_data(int argc, char **argv, t_abst *d)
 	}
 	if (argc < 5 + d->is_here_doc)
 		return (write(2, "pipex: not enough arguments\n", 28), 0);
-	if (!create_cmds(argc, argv, &d->cmds, d->is_here_doc))
-		return (0);
-	if (!init_pipes(d))
-		return (perror("pipex"), free_all(d), 0);
 	if (!open_io_files(argc, argv, d))
+		return (perror("pipex"), 0);
+	if (!create_cmds(argc, argv, &d->cmds, d->is_here_doc))
+	{
+		(close(d->iofd[0]), close(d->iofd[1]));
+		return (0);
+	}
+	if (!init_pipes(d))
+	{
+		(close(d->iofd[0]), close(d->iofd[1]));
 		return (perror("pipex"), free_all(d), 0);
+	}
 	return (1);
 }

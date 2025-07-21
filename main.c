@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: josefelghnam <josefelghnam@student.42.f    +#+  +:+       +#+        */
+/*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:31 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/19 18:28:09 by josefelghna      ###   ########.fr       */
+/*   Updated: 2025/07/21 17:32:27 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static int	exec_cmd(t_abst *d, size_t counter)
 	if (execve(d->cmds.arr[d->counter][0], d->cmds.arr[d->counter], __environ)
 		== -1)
 	{
-		ft_putstr_fd("pipex: ", 2);
+		ft_putstr_fd("pipexxx: ", 2);
 		ft_putstr_fd(ft_strrchr(d->cmds.arr[d->counter][0], '/') + 1, 2);
 		ft_putstr_fd(": ", 2);
 		perror("");
@@ -68,7 +68,8 @@ int	main(int argc, char **argv)
 		if (d.pid == -1)
 			return (free_all(&d), perror("pipex"), 1);
 		if (d.pid == 0)
-			exec_cmd(&d, d.counter);
+			if (!exec_cmd(&d, d.counter))
+				return (free_all(&d), 1);
 		d.counter++;
 	}
 	close_pipes(&d);

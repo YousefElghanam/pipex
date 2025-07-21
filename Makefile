@@ -12,9 +12,9 @@ CFLAGS = -Wall -Wextra -Werror -Ilibft -g
 
 HEADERS = pipex.h pipex_bonus.h libft/libft.h
 
-SOURCES = main.c utils.c commands.c init.c
+SOURCES = main.c utils.c utils_2.c commands.c init.c
 
-BONUS_SOURCES = main_bonus.c utils_bonus.c commands_bonus.c init_bonus.c
+BONUS_SOURCES = main_bonus.c utils_bonus.c utils_2_bonus.c commands_bonus.c init_bonus.c
 
 OBJECTS = $(SOURCES:%.c=$(OBJ_DIR)%.o)
 
