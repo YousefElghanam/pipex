@@ -6,7 +6,7 @@
 /*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:25 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/21 20:34:04 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/24 16:05:00 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,22 @@ static int	open_io_files(int argc, char **argv, t_abst *d)
 {
 	d->iofd[0] = open(argv[1], O_RDONLY);
 	if (d->iofd[0] == -1)
+	{
+		write(2, "pipex: ", 7);
+		write(2, argv[1], ft_strlen(argv[1]));
+		write(2, ": ", 2);
+		perror("");
 		return (0);
+	}
 	d->iofd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (d->iofd[1] == -1)
+	{
+		write(2, "pipex: ", 7);
+		write(2, argv[argc - 1], ft_strlen(argv[argc - 1]));
+		write(2, ": ", 2);
+		perror("");
 		return (0);
+	}
 	return (1);
 }
 
@@ -44,7 +56,7 @@ int	init_data(int argc, char **argv, t_abst *d)
 {
 	d->counter = 0;
 	if (!open_io_files(argc, argv, d))
-		return (perror("pipex"), 0);
+		return (0);
 	if (!create_cmds(argc, argv, &d->cmds))
 	{
 		(close(d->iofd[0]), close(d->iofd[1]));

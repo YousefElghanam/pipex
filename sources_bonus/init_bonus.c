@@ -6,7 +6,7 @@
 /*   By: jel-ghna <jel-ghna@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 19:11:25 by jel-ghna          #+#    #+#             */
-/*   Updated: 2025/07/21 21:35:52 by jel-ghna         ###   ########.fr       */
+/*   Updated: 2025/07/24 16:28:04 by jel-ghna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,11 @@ static void	fill_here_doc(t_abst *d)
 		ft_printf ("> ");
 		line = get_next_line(0);
 		if (!line)
+		{
+			ft_printf("\nwarning: here-document at line 42 delimited by ");
+			ft_printf("end-of-file (wanted `%s')\n", d->limiter);
 			break ;
+		}
 		if (is_limiter(line, d->limiter))
 		{
 			free(line);
@@ -59,11 +63,20 @@ static int	here_doc(int argc, char **argv, t_abst *d)
 		unlink(".tmp");
 	d->iofd[0] = open(".tmp", O_RDWR | O_CREAT, 0666);
 	if (d->iofd[0] == -1)
+	{
+		perror("pipex: .tmp: ");
 		return (0);
+	}
+	fill_here_doc(d);
 	d->iofd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (d->iofd[1] == -1)
+	{
+		write(2, "pipex: ", 7);
+		write(2, argv[argc - 1], ft_strlen(argv[argc - 1]));
+		write(2, ": ", 2);
+		perror("");
 		return (0);
-	fill_here_doc(d);
+	}
 	close(d->iofd[0]);
 	return (1);
 }
@@ -74,10 +87,22 @@ static int	open_io_files(int argc, char **argv, t_abst *d)
 	{
 		d->iofd[0] = open(argv[1], O_RDONLY);
 		if (d->iofd[0] == -1)
+		{
+			write(2, "pipex: ", 7);
+			write(2, argv[1], ft_strlen(argv[1]));
+			write(2, ": ", 2);
+			perror("");
 			return (0);
+		}
 		d->iofd[1] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (d->iofd[1] == -1)
+		{
+			write(2, "pipex: ", 7);
+			write(2, argv[argc - 1], ft_strlen(argv[argc - 1]));
+			write(2, ": ", 2);
+			perror("");
 			return (0);
+		}
 	}
 	else if (!here_doc(argc, argv, d))
 		return (0);
@@ -96,7 +121,7 @@ int	init_data(int argc, char **argv, t_abst *d)
 	if (argc < 5 + d->is_here_doc)
 		return (write(2, "pipex: not enough arguments\n", 28), 0);
 	if (!open_io_files(argc, argv, d))
-		return (perror("pipex"), 0);
+		return (0);
 	if (!create_cmds(argc, argv, &d->cmds, d->is_here_doc))
 	{
 		(close(d->iofd[0]), close(d->iofd[1]));

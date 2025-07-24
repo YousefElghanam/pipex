@@ -8,9 +8,13 @@ OBJ_DIR = objects/
 
 OBJ_DIR_BONUS = objects_bonus/
 
-CFLAGS = -Wall -Wextra -Werror -Ilibft -g
+CFLAGS = -Wall -Wextra -Werror -Ilibft
 
 HEADERS = pipex.h pipex_bonus.h libft/libft.h
+
+SOURCES_DIR = sources/
+
+SOURCES_DIR_BONUS = sources_bonus/
 
 SOURCES = main.c utils.c utils_2.c commands.c init.c
 
@@ -27,7 +31,7 @@ all: $(NAME) $(NAME_BONUS)
 $(NAME): $(LIBFT) $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBFT) -o $(NAME)
 
-$(OBJ_DIR)%.o: %.c | $(OBJ_DIR)
+$(OBJ_DIR)%.o: $(SOURCES_DIR)%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(OBJ_DIR):
@@ -38,7 +42,7 @@ bonus: $(NAME_BONUS)
 $(NAME_BONUS): $(LIBFT) $(OBJECTS_BONUS)
 	$(CC) $(OBJECTS_BONUS) $(LIBFT) -o $(NAME_BONUS)
 
-$(OBJ_DIR_BONUS)%.o: %.c | $(OBJ_DIR_BONUS)
+$(OBJ_DIR_BONUS)%.o: $(SOURCES_DIR_BONUS)%.c | $(OBJ_DIR_BONUS)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(OBJ_DIR_BONUS):
